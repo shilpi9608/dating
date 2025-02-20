@@ -39,8 +39,8 @@ export default function ChatList({ onSelectChat }) {
             <AvatarFallback>{chat.name[0]}</AvatarFallback>
           </Avatar>
           <div>
-            <h3 className='font-semibold text-custom-coral'>{chat.name}</h3>
-            <p className='text-sm text-custom-coral opacity-70'>
+            <h3 className='font-semibold text-white'>{chat.name}</h3>
+            <p className='text-sm text-white opacity-70'>
               {chat.lastMessage}
             </p>
           </div>

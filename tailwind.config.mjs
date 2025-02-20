@@ -16,6 +16,7 @@ export default {
         custom: {
           pink: '#FCC6FF',
           babypink: '#FFB7CE',
+          babyblue: '#89CFF0',
           beige: '#FFE6C9',
           orange: '#FFC785',
           coral: '#FFA09B',

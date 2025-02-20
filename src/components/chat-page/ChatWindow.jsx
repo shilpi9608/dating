@@ -35,7 +35,7 @@ export default function ChatWindow({ chatId, onBack }) {
 
   return (
     <div className='flex flex-col h-full bg-custom-beige'>
-      <div className='bg-custom-pink p-4 flex items-center'>
+      <div className='bg-custom-coral p-4 flex items-center'>
         {onBack && (
           <Button
             variant='ghost'
@@ -50,7 +50,7 @@ export default function ChatWindow({ chatId, onBack }) {
           <AvatarImage src='/alice-avatar.jpg' alt='Alice' />
           <AvatarFallback>A</AvatarFallback>
         </Avatar>
-        <h2 className='text-xl font-semibold text-custom-coral'>Alice</h2>
+        <h2 className='text-xl font-semibold text-white'>Alice</h2>
       </div>
       <div className='flex-grow overflow-y-auto p-4 space-y-4'>
         {messages.map((message) => (

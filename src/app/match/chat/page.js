@@ -9,7 +9,7 @@ export default function ChatPage() {
 
   return (
     <div className='flex h-screen'>
-      <div className='w-full md:w-1/3 bg-custom-pink'>
+      <div className='w-full md:w-1/3 bg-custom-orange'>
         <ChatList onSelectChat={setSelectedChat} />
       </div>
       <div className='hidden md:block md:w-2/3 bg-custom-beige'>
