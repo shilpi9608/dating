@@ -62,11 +62,11 @@ body {
   }
 }
 * {
-  cursor: url("/heart-cursor.png"), auto;
+  cursor: url('/heart-cursor.png'), auto;
 }
 
 body {
-  @apply bg-gradient-to-b from-custom-pink to-custom-coral min-h-screen;
+  @apply min-h-screen;
 }
 
 .card-hover-effect {
