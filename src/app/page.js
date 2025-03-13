@@ -1,13 +1,4 @@
-import Header from '@/components/Header';
-import Image from 'next/image';
-import Link from 'next/link';
-
-import {
-  TextRevealCard,
-  TextRevealCardDescription,
-  TextRevealCardTitle,
-} from '@/components/ui/text-reveal-card';
-import AboutSection from '@/components/About';
+import AboutSection from '@/components/home-page/About';
 import Hero from '@/components/home-page/hero';
 
 export default function Home() {
@@ -20,7 +11,6 @@ export default function Home() {
       />
     </div> */}
       <Hero />
-
       <AboutSection />
       <div className='min-h-screen'>Contact</div>
     </div>

@@ -10,7 +10,7 @@ export default function Hero() {
 
       {/* Hero section */}
       <div className='container relative z-10 px-4 mx-auto'>
-        <div className='flex flex-col items-center justify-between py-12 md:flex-row md:py-24 lg:py-32'>
+        <div className='flex flex-col items-center justify-evenly py-12 md:flex-row md:py-24 lg:py-32'>
           <div className='max-w-md text-center md:text-left md:max-w-lg'>
             <h1 className='text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl'>
               <span className='block text-primary'>You bring the spark,</span>
@@ -22,13 +22,19 @@ export default function Hero() {
             </p>
             <div className='flex flex-col mt-8 space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4 md:justify-start justify-center'>
               <Link href='/find'>
-                <Button size='lg' className='px-8'>
+                <button
+                  size='lg'
+                  className='btn-primary rounded-2xl text-md font-medium'
+                >
                   Start matching
-                </Button>
+                </button>
               </Link>
-              <Button size='lg' variant='outline'>
+              <button
+                size='lg'
+                className='btn-secondary rounded-2xl text-sm font-medium'
+              >
                 Learn more
-              </Button>
+              </button>
             </div>
             <div className='flex items-center justify-center mt-10 space-x-6 md:justify-start'>
               <div className='text-center'>

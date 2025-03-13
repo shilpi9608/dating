@@ -80,3 +80,11 @@ body {
     @apply bg-background text-foreground;
   }
 }
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-primaryBtn text-white hover:bg-opacity-50 transition cursor-pointer border-b-4 border-t-2 border-l-2 border-r-4 border-black;
+  }
+  .btn-secondary {
+    @apply px-6 py-2 bg-secondaryBtn text-white hover:bg-opacity-50 transition cursor-pointer border-b-4 border-t-2 border-l-2 border-r-4 border-black;
+  }
+}
