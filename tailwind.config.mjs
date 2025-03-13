@@ -21,8 +21,13 @@ export default {
           orange: '#FFC785',
           coral: '#FFA09B',
         },
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        background: '#FFE6C9', // Background color
+        secondaryBackground: '#ffc688', // Secondary background color for sections/cards
+        primaryBtn: '#FF8C42', // Primary button color
+        secondaryBtn: '#A93226', // Secondary button color
+        navbar: '#9b6b52', // Navbar background color
+        textColor: '#4B3621', // Main text color
+        foreground: '#4B3621',
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
