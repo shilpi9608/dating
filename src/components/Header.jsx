@@ -40,6 +40,7 @@ const Header = () => {
             Login
           </Link>
 
+
           <Link
             href='/register'
             className='relative btn-primary rounded-full text-sm font-medium'
