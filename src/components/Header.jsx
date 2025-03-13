@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const Header = () => {
   return (
-    <header className="bg-[#b7abff] p-4 shadow-md">
+    <header className="bg-[#b7abff] fixed w-full z-50 top-0 p-4 shadow-md">
     <div className="container mx-auto flex justify-between items-center">
       <div className="text-2xl font-bold text-white">shiva</div>
       <nav className="hidden md:flex space-x-8">
