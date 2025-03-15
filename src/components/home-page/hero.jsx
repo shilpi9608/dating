@@ -4,7 +4,7 @@ import FallingLeaves from './FallingLeaves';
 
 export default function Hero() {
   return (
-    <main className='relative min-h-screen overflow-hidden'>
+    <main className='relative h-fit overflow-hidden'>
       {/* Animated falling leaves background */}
       <FallingLeaves />
 
