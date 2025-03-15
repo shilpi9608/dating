@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
       >
 
         <Header/>
-        <main className="w-full mx-0 mt-20 p-0 min-h-screen">
+        <main className="w-full mx-0 p-0 min-h-screen">
         {children}
         </main>
       </body>
