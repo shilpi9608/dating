@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 
 export const SideBar = ({ gossip }) => {
   return (
-    <div className='fixed w-[400px] h-screen overflow-y-auto bg-custom-orange/20 p-6 border-r'>
+    <div className='relative w-[400px]  bg-custom-orange/20 p-6 border-r'>
       <Card className='bg-transparent border-none shadow-none'>
         <CardContent className='p-0'>
           <div className='flex flex-col gap-8 items-center'>
