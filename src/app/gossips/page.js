@@ -313,25 +313,6 @@ export default function GossipPage() {
       )}
 
       {/* Footer */}
-      <footer className='bg-white border-t border-pink-100 py-4 mt-auto'>
-        <div className='container mx-auto px-4 text-center text-sm text-pink-400'>
-          <p>
-            Campus Crush Gossip © 2025 • All gossip is anonymous & just for fun!
-            💖
-          </p>
-          <div className='flex justify-center gap-4 mt-2'>
-            <a href='#' className='text-pink-500 hover:text-pink-600'>
-              About
-            </a>
-            <a href='#' className='text-pink-500 hover:text-pink-600'>
-              Privacy
-            </a>
-            <a href='#' className='text-pink-500 hover:text-pink-600'>
-              Contact
-            </a>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }
