@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const uri = process.env.MONGODB_URI || "mongodb+srv://theshilpisingh1:<db_password>@shiva.sxb1v3w.mongodb.net/?retryWrites=true&w=majority&appName=shiva";
+const uri = process.env.MONGODB_URI || "";
 
 // Stable API client options, with additional options for URL parsing and topology management.
 const clientOptions = {
