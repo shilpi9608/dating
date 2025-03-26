@@ -13,7 +13,7 @@ export const GossipChat = ({ gossip }) => {
     setNewComment('');
   };
   return (
-    <div className='col-start-2 min-h-screen relative'>
+    <div className='col-start-2 min-h-screen fixed top-0 right-0 left-[400px] overflow-y-auto'>
       <div className='p-6 pb-24'>
         <div className='flex justify-between items-center mb-6'>
           <h2 className='text-xl font-semibold'>Comments</h2>
