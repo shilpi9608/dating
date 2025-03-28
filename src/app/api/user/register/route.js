@@ -1,15 +1,11 @@
-// app/api/register/route.js
-
 import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import run from '@/lib/mongodb';
 import User from '@/models/user.models';
+import DB from '@/lib/mongodb';
+import bcryptjs from 'bcryptjs';
 
+DB();
 export async function POST(request) {
   try {
-    // Connect to MongoDB
-    await run();
-
     // Parse the incoming JSON data
     const body = await request.json();
     const {
@@ -22,7 +18,12 @@ export async function POST(request) {
     } = body;
 
     // Basic validation for required fields
-    if (!email || !password || !personalInformation?.name || !personalInformation?.age) {
+    if (
+      !email ||
+      !password ||
+      !personalInformation?.name ||
+      !personalInformation?.age
+    ) {
       return NextResponse.json(
         { error: 'Missing required fields: email, password, name, or age.' },
         { status: 400 }
@@ -39,8 +40,8 @@ export async function POST(request) {
     }
 
     // Hash the password before saving
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(password, salt);
 
     // Create a new user with empty values for about, interests, preferences, photos, and likes.
     const newUser = new User({
