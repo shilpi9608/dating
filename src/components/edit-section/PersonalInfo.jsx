@@ -1,15 +1,8 @@
+'use client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EditableField } from '../EditableField';
 
-export function PersonalInfoSection() {
-  // In a real app, you'd fetch this data from your backend
-  const personalInfo = {
-    name: 'Sarah Parker',
-    age: '24',
-    height: '165',
-    religion: 'Hindu',
-  };
-
+export function PersonalInfoSection({ personalInfo }) {
   const handleSave = (field, value) => {
     console.log(`Saving ${field}: ${value}`);
     // In a real app, you'd send this to your backend
@@ -39,10 +32,20 @@ export function PersonalInfoSection() {
           inputType='number'
         />
         <EditableField
+          label='Smoking Habits'
+          value={personalInfo.smoking}
+          onSave={(value) => handleSave('smoking', value)}
+        />
+        <EditableField
+          label='Drinking Habits'
+          value={personalInfo.drinking}
+          onSave={(value) => handleSave('drinking', value)}
+          inputType='number'
+        />
+        <EditableField
           label='Religion'
           value={personalInfo.religion}
           onSave={(value) => handleSave('religion', value)}
-          inputType=''
         />
       </CardContent>
     </Card>
