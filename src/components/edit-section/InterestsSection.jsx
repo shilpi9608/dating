@@ -1,25 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, X } from 'lucide-react';
 
-export function InterestsSection({ userInterests }) {
-  const [interests, setInterests] = useState(userInterests);
+export function InterestsSection({ userInterests, onUpdate }) {
+  const [interests, setInterests] = useState(userInterests || []);
   const [newInterest, setNewInterest] = useState('');
 
+  // keep local state in sync if parent prop changes
+  useEffect(() => {
+    setInterests(userInterests || []);
+  }, [userInterests]);
+
   const addInterest = () => {
-    if (newInterest && !interests.includes(newInterest)) {
-      setInterests([...interests, newInterest]);
-      setNewInterest('');
+    const trimmed = newInterest.trim();
+    if (trimmed && !interests.includes(trimmed)) {
+      const updated = [...interests, trimmed];
+      setInterests(updated);
+      onUpdate(updated);
     }
+    setNewInterest('');
   };
 
-  const removeInterest = (interest) => {
-    setInterests(interests.filter((i) => i !== interest));
+  const removeInterest = (interestToRemove) => {
+    const updated = interests.filter((i) => i !== interestToRemove);
+    setInterests(updated);
+    onUpdate(updated);
   };
 
   return (
@@ -33,13 +43,13 @@ export function InterestsSection({ userInterests }) {
             <Badge
               key={interest}
               variant='secondary'
-              className='px-3 py-1 text-sm'
+              className='px-3 py-1 text-sm flex items-center'
             >
               {interest}
               <Button
                 variant='ghost'
-                size='sm'
-                className='ml-2 h-auto p-0'
+                size='icon'
+                className='ml-2 p-0'
                 onClick={() => removeInterest(interest)}
               >
                 <X className='h-3 w-3' />
@@ -52,11 +62,10 @@ export function InterestsSection({ userInterests }) {
             placeholder='Add new interest'
             value={newInterest}
             onChange={(e) => setNewInterest(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && addInterest()}
+            onKeyDown={(e) => e.key === 'Enter' && addInterest()}
           />
           <Button onClick={addInterest}>
-            <Plus className='h-4 w-4 mr-2' />
-            Add
+            <Plus className='h-4 w-4 mr-2' /> Add
           </Button>
         </div>
       </CardContent>

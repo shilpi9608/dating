@@ -2,11 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EditableField } from '@/components/EditableField';
 
-export function PreferencesSection({ preferences }) {
-  const handleSave = (field, value) => {
-    console.log(`Saving ${field}: ${value}`);
-  };
-
+export function PreferencesSection({ preferences, onUpdate }) {
   return (
     <Card className='w-full'>
       <CardHeader>
@@ -16,17 +12,17 @@ export function PreferencesSection({ preferences }) {
         <EditableField
           label='Looking For'
           value={preferences?.matchType || ''}
-          onSave={(value) => handleSave('lookingFor', value)}
+          onSave={(value) => onUpdate('matchType', value)}
         />
         <EditableField
           label='Interested In'
           value={preferences?.matchGender || ''}
-          onSave={(value) => handleSave('interestedIn', value)}
+          onSave={(value) => onUpdate('matchGender', value)}
         />
         <EditableField
           label='Desired Qualities'
           value={preferences?.qualities || ''}
-          onSave={(value) => handleSave('desiredQualities', value)}
+          onSave={(value) => onUpdate('qualities', value)}
         />
       </CardContent>
     </Card>

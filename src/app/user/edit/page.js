@@ -12,7 +12,6 @@ import { toast } from 'react-toastify';
 
 export default function EditProfilePage() {
   const [activeSection, setActiveSection] = useState('basic');
-  const [photos, setPhotos] = useState([]);
   const [profile, setProfile] = useState({
     personalInformation: {
       name: '',
@@ -24,50 +23,71 @@ export default function EditProfilePage() {
     },
     gossipUserName: '',
     about: '',
-    collegeInformation: {
-      year: 0,
-      branch: '',
-    },
+    collegeInformation: { year: 0, branch: '' },
     interests: [],
     photos: [],
-    preferences: {
-      matchType: '',
-      matchGender: '',
-      qualities: '',
-    },
+    preferences: { matchType: '', matchGender: '', qualities: '' },
     email: '',
-    likes: '',
+    likes: [],
   });
 
+  // Fetch current user data
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    async function fetchUserProfile() {
       try {
-        const token = localStorage.getItem('token'); // or from cookies if stored there
-
+        const token = localStorage.getItem('token');
         if (!token) {
           toast.error('User not authenticated');
           return;
         }
-
-        const response = await axios.get('/api/user/owninfo', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const { data } = await axios.get('/api/user/owninfo', {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        if (response.status === 200) {
-          setProfile(response.data.user);
-          setPhotos(response.data.user.photos);
-        }
+        setProfile(data.user);
       } catch (error) {
         console.error('Failed to fetch profile:', error);
         toast.error(
           error.response?.data?.error || 'Failed to fetch user profile.'
         );
       }
-    };
-
+    }
     fetchUserProfile();
   }, []);
+
+  // Generic update handler accumulating changes in state
+  const handleUpdate = (fieldPath, value) => {
+    setProfile((prev) => {
+      const updated = { ...prev };
+      const keys = fieldPath.split('.');
+      let obj = updated;
+      // traverse to nested object
+      console.log('|||||||||||||||||||||||');
+      for (let i = 0; i < keys.length - 1; i++) {
+        obj[keys[i]] = { ...obj[keys[i]] };
+        obj = obj[keys[i]];
+      }
+      obj[keys[keys.length - 1]] = value;
+      return updated;
+    });
+  };
+
+  // Save all changes at once
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('User not authenticated');
+        return;
+      }
+      await axios.patch('/api/user/update', profile, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success('Profile updated successfully!');
+    } catch (error) {
+      console.error('Update failed:', error);
+      toast.error(error.response?.data?.error || 'Failed to update profile.');
+    }
+  };
 
   return (
     <div className='min-h-screen bg-gradient-to-b from-pink to-coral'>
@@ -76,60 +96,40 @@ export default function EditProfilePage() {
           title='Edit Your Profile'
           subtitle='Make your profile stand out'
         />
+        <div className='flex justify-end'>
+          <button
+            onClick={handleSave}
+            className='bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition'
+          >
+            Save Changes
+          </button>
+        </div>
         <div className='space-y-12'>
           <PhotoGallery
-            photos={photos}
-            setPhotos={(updatedPhotos) => {
-              setPhotos(updatedPhotos);
-              updateProfile({ photos: updatedPhotos });
-            }}
+            photos={profile.photos}
+            setPhotos={(photos) => handleUpdate('photos', photos)}
           />
-
           <PersonalInfoSection
             personalInfo={profile.personalInformation}
-            onUpdate={(field, value) => {
-              const updatedInfo = {
-                ...profile.personalInformation,
-                [field]: value,
-              };
-              setProfile((prev) => ({
-                ...prev,
-                personalInformation: updatedInfo,
-              }));
-              updateProfile({ personalInformation: updatedInfo });
-            }}
+            onUpdate={(field, value) =>
+              handleUpdate(`personalInformation.${field}`, value)
+            }
           />
-
           <CollegeInfoSection
             collegeInfo={profile.collegeInformation}
-            onUpdate={(field, value) => {
-              const updatedInfo = {
-                ...profile.collegeInformation,
-                [field]: value,
-              };
-              setProfile((prev) => ({
-                ...prev,
-                collegeInformation: updatedInfo,
-              }));
-              updateProfile({ collegeInformation: updatedInfo });
-            }}
+            onUpdate={(field, value) =>
+              handleUpdate(`collegeInformation.${field}`, value)
+            }
           />
-
           <InterestsSection
             userInterests={profile.interests}
-            onUpdate={(interests) => {
-              setProfile((prev) => ({ ...prev, interests }));
-              updateProfile({ interests });
-            }}
+            onUpdate={(interests) => handleUpdate('interests', interests)}
           />
-
           <PreferencesSection
             preferences={profile.preferences}
-            onUpdate={(field, value) => {
-              const updatedPrefs = { ...profile.preferences, [field]: value };
-              setProfile((prev) => ({ ...prev, preferences: updatedPrefs }));
-              updateProfile({ preferences: updatedPrefs });
-            }}
+            onUpdate={(field, value) =>
+              handleUpdate(`preferences.${field}`, value)
+            }
           />
         </div>
       </div>

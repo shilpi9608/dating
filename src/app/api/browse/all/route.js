@@ -15,6 +15,7 @@ export async function GET(request) {
     const projection = {
       personalInformation: 1,
       collegeInformation: 1,
+      interests: 1,
       photos: { $slice: 1 }, // Return only the first photo
     };
 

@@ -17,18 +17,14 @@ export async function POST(request) {
     }
 
     const user = await User.findById(id, {
-      'personalInformation.name': 1,
-      'personalInformation.age': 1,
-      'personalInformation.height': 1,
-      'personalInformation.smoking': 1,
-      'personalInformation.drinking': 1,
-      'personalInformation.religion': 1,
-      'collegeInformation.year': 1,
-      'collegeInformation.branch': 1,
+      personalInformation: 1,
+      collegeInformation: 1,
       gossipUserName: 1,
       about: 1,
       interests: 1,
       photos: 1,
+      preferences: 1,
+      likes: 1,
       createdAt: 1,
     });
 

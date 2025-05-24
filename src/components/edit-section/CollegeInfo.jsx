@@ -2,12 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EditableField } from '../EditableField';
 
-export function CollegeInfoSection({ collegeInfo }) {
-  const handleSave = (field, value) => {
-    console.log(`Saving ${field}: ${value}`);
-    // In a real app, you'd send this to your backend
-  };
-
+export function CollegeInfoSection({ collegeInfo, onUpdate }) {
   return (
     <Card className='w-full'>
       <CardHeader>
@@ -17,12 +12,12 @@ export function CollegeInfoSection({ collegeInfo }) {
         <EditableField
           label='Year of Study'
           value={collegeInfo.year}
-          onSave={(value) => handleSave('year', value)}
+          onSave={(value) => onUpdate('year', value)}
         />
         <EditableField
           label='Branch'
           value={collegeInfo.branch}
-          onSave={(value) => handleSave('branch', value)}
+          onSave={(value) => onUpdate('branch', value)}
         />
       </CardContent>
     </Card>
