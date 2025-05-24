@@ -13,11 +13,8 @@ export async function GET(request) {
 
     // Project only the fields needed for card display
     const projection = {
-      'personalInformation.name': 1,
-      'personalInformation.age': 1,
-      gossipUserName: 1,
-      'collegeInformation.year': 1,
-      'collegeInformation.branch': 1,
+      personalInformation: 1,
+      collegeInformation: 1,
       photos: { $slice: 1 }, // Return only the first photo
     };
 
