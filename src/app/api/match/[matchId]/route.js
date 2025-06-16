@@ -27,8 +27,8 @@ export async function GET(request, { params }) {
   try {
     // 3. Find match
     const match = await Match.findById(matchId)
-      .populate('person1', 'name email')
-      .populate('person2', 'name email');
+      .populate('person1', 'personalInformation email')
+      .populate('person2', 'personalInformation email');
     if (!match) {
       return NextResponse.json({ error: 'Match not found' }, { status: 404 });
     }
@@ -44,7 +44,7 @@ export async function GET(request, { params }) {
       );
     }
     // 5. Return the match (including messages)
-    return NextResponse.json({ match }, { status: 200 });
+    return NextResponse.json({ userId, match }, { status: 201 });
   } catch (err) {
     console.error('Error fetching match:', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

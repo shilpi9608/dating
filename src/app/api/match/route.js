@@ -26,12 +26,12 @@ export async function GET(request) {
       $or: [{ person1: userId }, { person2: userId }],
     })
       // Optionally populate basic info of the other user
-      .populate('person1', 'name email')
-      .populate('person2', 'name email')
+      .populate('person1', 'personalInformation email')
+      .populate('person2', 'personalInformation email')
       .sort({ updatedAt: -1 });
 
     // 4. Return
-    return NextResponse.json({ matches }, { status: 200 });
+    return NextResponse.json({ userId, matches }, { status: 201 });
   } catch (err) {
     console.error('Error fetching matches:', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

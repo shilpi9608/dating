@@ -1,60 +1,62 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, Search, Users } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-
-const mockChats = [
-  {
-    id: '1',
-    name: 'Alice',
-    lastMessage: 'Hey, how are you?',
-    avatar: '/alice-avatar.jpg',
-    time: '2m ago',
-  },
-  {
-    id: '2',
-    name: 'Bob',
-    lastMessage: 'Want to grab coffee?',
-    avatar: '/bob-avatar.jpg',
-    time: '1h ago',
-  },
-  {
-    id: '3',
-    name: 'Charlie',
-    lastMessage: 'See you at the library!',
-    avatar: '/charlie-avatar.jpg',
-    time: '3h ago',
-  },
-  {
-    id: '4',
-    name: 'Diana',
-    lastMessage: 'The movie was amazing!',
-    avatar: '/placeholder.svg?height=100&width=100',
-    time: 'Yesterday',
-  },
-  {
-    id: '5',
-    name: 'Ethan',
-    lastMessage: 'Thanks for the recommendation!',
-    avatar: '/placeholder.svg?height=100&width=100',
-    time: 'Yesterday',
-  },
-];
+import axios from 'axios';
 
 export default function ChatList({ onSelectChat }) {
-  const [chats, setChats] = useState(mockChats);
+  const [matches, setMatches] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedId, setSelectedId] = useState(null);
+  const [userId, setUserId] = useState(null); // Your user ID
 
-  const filteredChats = chats.filter((chat) =>
-    chat.name.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        const res = await axios.get('/api/match', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        const data = res.data;
+        if (res.status === 201) {
+          setUserId(data.userId);
+          const processed = data.matches.map((match) => {
+            const otherUser =
+              match.person1._id === data.userId ? match.person2 : match.person1;
+            console.log(match.messages);
+            return {
+              id: match._id,
+              userId: otherUser._id,
+              name: otherUser.personalInformation?.name || 'Unknown',
+              avatar:
+                otherUser.personalInformation?.avatar ||
+                '/placeholder.svg?height=100&width=100',
+              lastMessage: match.messages?.at(-1)?.content || 'No messages yet',
+              time: new Date(match.updatedAt).toLocaleDateString(),
+            };
+          });
+          setMatches(processed);
+        } else {
+          console.error(data.error);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    };
+
+    fetchMatches();
+  }, []);
+
+  const filteredMatches = matches.filter((match) =>
+    match.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSelectChat = (id) => {
-    setSelectedId(id);
-    onSelectChat(id);
+  const handleSelectChat = (matchId) => {
+    setSelectedId(matchId);
+    onSelectChat(matchId); // match _id, not userId
   };
 
   return (
@@ -80,14 +82,14 @@ export default function ChatList({ onSelectChat }) {
       <div className='flex items-center justify-between px-4 py-2 bg-[#de6b48]/20 border-b-2 border-black'>
         <div className='flex items-center gap-2 text-[#de6b48] font-medium'>
           <Users size={16} />
-          <span>{filteredChats.length} Matches</span>
+          <span>{filteredMatches.length} Matches</span>
         </div>
         <span className='text-xs text-[#de6b48]/70'>Online: 3</span>
       </div>
 
       <div className='flex-1 overflow-y-auto'>
-        {filteredChats.length > 0 ? (
-          filteredChats.map((chat) => (
+        {filteredMatches.length > 0 ? (
+          filteredMatches.map((chat) => (
             <div
               key={chat.id}
               className={`chat-list-item flex items-center p-4 cursor-pointer ${
