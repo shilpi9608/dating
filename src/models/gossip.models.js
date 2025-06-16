@@ -16,23 +16,20 @@ const ReplySchema = new mongoose.Schema(
   { _id: false }
 );
 
-const CommentSchema = new mongoose.Schema(
-  {
-    username: {
-      type: String,
-    },
-    content: {
-      type: String,
-    },
-    time: {
-      type: Date,
-      default: Date.now,
-    },
-    // If you expect multiple replies, use an array; if only one, remove the array.
-    reply: [ReplySchema],
+const CommentSchema = new mongoose.Schema({
+  username: {
+    type: String,
   },
-  { _id: false }
-);
+  content: {
+    type: String,
+  },
+  time: {
+    type: Date,
+    default: Date.now,
+  },
+  // If you expect multiple replies, use an array; if only one, remove the array.
+  reply: [ReplySchema],
+});
 
 const GossipSchema = new mongoose.Schema(
   {

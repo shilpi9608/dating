@@ -9,16 +9,24 @@ import {
   Users,
   Star,
 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
 import Decoration from '@/components/profile-page/Decoration';
 import { PhotoGallery } from '@/components/profile-page/PhotoGallery';
 import { toast } from 'react-toastify';
+import { comment } from 'postcss';
 
 export default function ProfilePage() {
   const { id } = useParams();
   const [user, setUser] = useState(null);
+  const [likeCount, setLikeCount] = useState(0);
+  const YEAR_LABELS = {
+    1: 'Fresher',
+    2: 'Sophomore',
+    3: 'Junior',
+    4: 'Senior',
+  };
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -27,6 +35,10 @@ export default function ProfilePage() {
       try {
         const res = await axios.post('/api/browse/one', { id });
         setUser(res.data.user);
+        console.log(res.data.user.likes);
+        setLikeCount(
+          Array.isArray(res.data.user.likes) ? res.data.user.likes.length : 0
+        );
       } catch (err) {
         console.error(err);
         const msg = err?.response?.data?.error || 'Failed to load profile.';
@@ -37,6 +49,39 @@ export default function ProfilePage() {
     loadProfile();
   }, [id]);
 
+  const handleLike = useCallback(async () => {
+    if (!id) return;
+    try {
+      // Retrieve JWT token
+      const token =
+        typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      if (!token) {
+        toast.warn('You must be logged in to like profiles.');
+        return;
+      }
+
+      const res = await axios.post(
+        '/api/match/likeprofile',
+        { likedUserId: id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.status === 201 && res.data.match) {
+        toast.success("It's a match! 🎉");
+      } else {
+        toast.success(res.data.message || 'Profile liked successfully.');
+      }
+    } catch (err) {
+      console.error('Like Error:', err);
+      const msg = err?.response?.data?.error || 'Failed to like profile.';
+      toast.error(msg);
+    }
+  }, [id]);
+
   if (!user) return null;
 
   const {
@@ -44,6 +89,7 @@ export default function ProfilePage() {
     collegeInformation = {},
     interests = [],
     photos = [],
+    likes = [],
     preferences = {},
     about = '',
   } = user;
@@ -75,7 +121,7 @@ export default function ProfilePage() {
 
         <div className='grid lg:grid-cols-5 gap-8'>
           <div className='lg:col-span-2 space-y-6'>
-            <PhotoGallery photos={photos} userName={name} />
+            <PhotoGallery photos={photos} userName={name} likes={likeCount} />
 
             <Card className='shadow-lg bg-white/90 backdrop-blur-sm border border-pink-100/50'>
               <CardContent className='p-6'>
@@ -132,7 +178,9 @@ export default function ProfilePage() {
                 </h3>
                 <div className='bg-gradient-to-r from-orange-100 to-pink-100 rounded-lg p-4'>
                   <p className='text-amber-900 font-medium'>{branch}</p>
-                  <p className='text-amber-700'>Year {year}</p>
+                  <p className='text-amber-700'>
+                    {year > 0 && year < 5 ? YEAR_LABELS[year] : 'Secret'}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -190,7 +238,10 @@ export default function ProfilePage() {
             </Card>
 
             <div className='flex gap-4 justify-center pt-4'>
-              <button className='bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2 hover:from-pink-500 hover:to-rose-500'>
+              <button
+                onClick={handleLike}
+                className='bg-gradient-to-r from-pink-400 via-rose-400 to-pink-500 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2 hover:from-pink-500 hover:to-rose-500'
+              >
                 <Heart className='w-5 h-5 animate-pulse' /> Like Profile
               </button>
               <button className='bg-gradient-to-r from-amber-300 via-orange-300 to-pink-300 text-amber-900 px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-pink-200 flex items-center gap-2 hover:from-amber-400 hover:to-pink-400'>

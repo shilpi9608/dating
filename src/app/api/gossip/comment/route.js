@@ -1,3 +1,4 @@
+// app\api\gossip\comment\route.js
 import { NextResponse } from 'next/server';
 import DB from '@/lib/mongodb';
 import Gossip from '@/models/gossip.models';

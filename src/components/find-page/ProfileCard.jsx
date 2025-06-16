@@ -15,6 +15,12 @@ export default function ProfileCard({ profile }) {
   const bio = profile.about || '';
   const interests = Array.isArray(profile.interests) ? profile.interests : [];
   const id = profile._id || profile.id;
+  const YEAR_LABELS = {
+    1: 'Fresher',
+    2: 'Sophomore',
+    3: 'Junior',
+    4: 'Senior',
+  };
 
   return (
     <div className='bg-white rounded-3xl shadow-md overflow-hidden transition-all hover:shadow-lg border-2 border-pink-200 group'>
@@ -26,13 +32,6 @@ export default function ProfileCard({ profile }) {
           height={300}
           className='w-full h-48 object-cover'
         />
-        <Button
-          size='icon'
-          variant='outline'
-          className='absolute top-2 right-2 bg-white/80 hover:bg-white hover:text-pink-600 rounded-full border-pink-200 group-hover:border-pink-400 transition-all transform hover:scale-110'
-        >
-          <Heart className='h-4 w-4 group-hover:fill-pink-400' />
-        </Button>
 
         {/* Decorative corner hearts with extra cute hover effects */}
         <div className='absolute top-0 left-0 w-12 h-12 opacity-70 transform transition-transform group-hover:scale-110'>
@@ -54,7 +53,7 @@ export default function ProfileCard({ profile }) {
             variant='outline'
             className='bg-pink-100 text-pink-800 border-pink-200 rounded-full'
           >
-            {year}
+            {year > 0 && year < 5 ? YEAR_LABELS[year] : 'Secret'}
           </Badge>
         </div>
         <p className='text-gray-700 text-sm mb-3'>{bio}</p>

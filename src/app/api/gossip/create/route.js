@@ -1,3 +1,4 @@
+// app\api\gossip\create\route.js
 import { NextResponse } from 'next/server';
 import DB from '@/lib/mongodb';
 import User from '@/models/user.models';

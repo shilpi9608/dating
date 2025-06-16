@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 const Header = () => {
   return (
-    <header className='bg-navbar bg-opacity-80 p-4 shadow-md'>
+    <header className='bg-navbar bg-opacity-80 p-4 shadow-md relative z-10'>
       <div className='container mx-auto flex justify-between items-center'>
         <div className='text-2xl font-bold text-white'>shiva</div>
         <nav className='hidden md:flex space-x-8'>
@@ -39,7 +39,6 @@ const Header = () => {
           >
             Login
           </Link>
-
 
           <Link
             href='/register'

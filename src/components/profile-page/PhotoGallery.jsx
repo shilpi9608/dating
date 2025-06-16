@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronLeft, ChevronRight, Heart, Camera } from 'lucide-react';
 
-export function PhotoGallery({ photos, userName }) {
+export function PhotoGallery({ photos, userName, likes }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
@@ -107,11 +107,6 @@ export function PhotoGallery({ photos, userName }) {
             </>
           )}
 
-          {/* Heart Icon */}
-          <div className='absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2'>
-            <Heart className='w-5 h-5 text-pink-500' />
-          </div>
-
           {/* Photo Counter */}
           {photos.length > 1 && (
             <div className='absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1'>
@@ -181,7 +176,7 @@ export function PhotoGallery({ photos, userName }) {
             </span>
             <div className='flex items-center gap-1 bg-gradient-to-r from-pink-400 to-rose-400 text-white px-3 py-1 rounded-full text-sm font-medium'>
               <Heart className='w-4 h-4 fill-current' />
-              <span>1,247 likes</span>
+              <span>{likes} likes</span>
             </div>
           </div>
         </div>
