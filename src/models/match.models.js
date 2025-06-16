@@ -1,20 +1,17 @@
 import mongoose from 'mongoose';
 
-const MessageSchema = new mongoose.Schema(
-  {
-    sender: {
-      type: String,
-    },
-    content: {
-      type: String,
-    },
-    time: {
-      type: Date,
-      default: Date.now,
-    },
+const MessageSchema = new mongoose.Schema({
+  sender: {
+    type: String,
   },
-  { _id: false }
-);
+  content: {
+    type: String,
+  },
+  time: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
 const MatchSchema = new mongoose.Schema(
   {
