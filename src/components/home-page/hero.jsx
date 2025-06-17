@@ -29,12 +29,14 @@ export default function Hero() {
                   Start matching
                 </button>
               </Link>
-              <button
-                size='lg'
-                className='btn-secondary rounded-2xl text-sm font-medium'
-              >
-                Learn more
-              </button>
+              <Link href='/gossips'>
+                <button
+                  size='lg'
+                  className='btn-secondary rounded-2xl text-sm font-medium'
+                >
+                  Gossip Around
+                </button>
+              </Link>
             </div>
             <div className='flex items-center justify-center mt-10 space-x-6 md:justify-start'>
               <div className='text-center'>

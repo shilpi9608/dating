@@ -15,7 +15,10 @@ export default function ChatPage() {
       </div>
       <div className='hidden md:block md:w-2/3 bg-[#ffefd5] relative'>
         {selectedChat ? (
-          <ChatWindow chatId={selectedChat} />
+          <ChatWindow
+            chatId={selectedChat}
+            onBack={() => setSelectedChat(null)}
+          />
         ) : (
           <div className='flex flex-col items-center justify-center h-full'>
             <div className='empty-state'>

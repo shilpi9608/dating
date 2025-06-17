@@ -42,7 +42,6 @@ const UserSchema = new mongoose.Schema(
       },
       branch: {
         type: String,
-        trim: true,
       },
     },
     interests: {

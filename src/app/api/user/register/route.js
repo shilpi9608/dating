@@ -10,13 +10,11 @@ export async function POST(request) {
     const body = await request.json();
     const {
       personalInformation,
-      gossipUserName,
-      collegeInformation,
-      preferences,
       email,
       password,
+      collegeInformation,
+      gossipUserName,
     } = body;
-
     // Basic validation for required fields
     if (
       !email ||
@@ -26,16 +24,25 @@ export async function POST(request) {
     ) {
       return NextResponse.json(
         { error: 'Missing required fields: email, password, name, or age.' },
-        { status: 400 }
+        { status: 406 }
       );
     }
 
     // Check if a user with the given email already exists
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
       return NextResponse.json(
         { error: 'User with this email already exists.' },
-        { status: 400 }
+        { status: 408 }
+      );
+    }
+    console.log(gossipUserName);
+    const existingGossip = await User.findOne({ gossipUserName });
+    if (existingGossip) {
+      return NextResponse.json(
+        { error: 'This gossipUserName already exists, please change.' },
+        { status: 409 }
       );
     }
 
@@ -43,18 +50,13 @@ export async function POST(request) {
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
 
-    // Create a new user with empty values for about, interests, preferences, photos, and likes.
+    // Create a new user
     const newUser = new User({
       personalInformation,
-      gossipUserName,
       collegeInformation,
       email,
+      gossipUserName,
       password: hashedPassword,
-      about: '',
-      interests: [],
-      preferences,
-      photos: [],
-      likes: [],
     });
 
     // Save the new user to the database

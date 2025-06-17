@@ -1,26 +1,27 @@
 import mongoose from 'mongoose';
 
-const ReplySchema = new mongoose.Schema({
-  username: {
-    type: String,
+const ReplySchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+    },
+    content: {
+      type: String,
+    },
+    time: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  content: {
-    type: String,
-  },
-  time: {
-    type: Date,
-    default: Date.now,
-  },
-}, { _id: false });
+  { _id: false }
+);
 
 const CommentSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: true,
   },
   content: {
     type: String,
-    required: true,
   },
   time: {
     type: Date,
@@ -28,7 +29,7 @@ const CommentSchema = new mongoose.Schema({
   },
   // If you expect multiple replies, use an array; if only one, remove the array.
   reply: [ReplySchema],
-}, { _id: false });
+});
 
 const GossipSchema = new mongoose.Schema(
   {
