@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
+import { createPusherClient } from '@/lib/pusher-client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,6 @@ import { ArrowLeft, Heart, Image, Send, Smile } from 'lucide-react';
 export default function ChatWindow({ chatId, onBack }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false); // can use for real-time; here unused
   const [userId, setUserId] = useState(null);
   const [otherUser, setOtherUser] = useState(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -57,7 +57,11 @@ export default function ChatWindow({ chatId, onBack }) {
     '🤤',
   ];
 
-  // Auto scroll to bottom on new messages
+  // Pusher client instance
+  const [pusherClient, setPusherClient] = useState(null);
+  const channelName = `private-match-${chatId}`;
+
+  // Scroll to bottom
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -65,16 +69,20 @@ export default function ChatWindow({ chatId, onBack }) {
     scrollToBottom();
   }, [messages]);
 
-  // Fetch match messages on mount or when chatId changes
+  // Fetch initial chat data and set up Pusher
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token for chat');
+      return;
+    }
+    let pusher = null;
+    let channel = null;
+    let currentUserId = null; // Store userId in closure
+
     const fetchChat = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          console.error('No token for fetching chat');
-          return;
-        }
-        // Adjust path if needed:
+        // 1. Fetch existing messages
         const res = await axios.get(`/api/match/${chatId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -83,22 +91,22 @@ export default function ChatWindow({ chatId, onBack }) {
         if (res.status === 201) {
           const { match, userId: uid } = res.data;
           setUserId(uid);
+          currentUserId = uid; // Store in closure for Pusher callback
 
-          // Determine the other participant
+          // Determine other user
           const other =
             match.person1._id === uid ? match.person2 : match.person1;
-
           setOtherUser({
             id: other._id,
             name: other.personalInformation?.name || 'Unknown',
             avatar:
               other.personalInformation?.avatar ||
               '/placeholder.svg?height=100&width=100',
-            status: 'online', // could fetch real status separately
+            status: 'online', // or fetch real presence separately
           });
 
-          // Structure messages into local format
-          const structuredMessages = match.messages.map((msg) => ({
+          // Structure existing messages
+          const structured = match.messages.map((msg) => ({
             id: msg._id,
             sender: msg.sender === uid ? 'user' : 'match',
             content: msg.content,
@@ -107,53 +115,91 @@ export default function ChatWindow({ chatId, onBack }) {
               minute: '2-digit',
             }),
           }));
-
-          setMessages(structuredMessages);
+          setMessages(structured);
         } else {
-          console.error('Failed to fetch chat:', res.status, res.data);
+          console.error('Fetch chat error:', res.status, res.data);
         }
+
+        // 2. Initialize Pusher client and subscribe
+        pusher = createPusherClient(token);
+        setPusherClient(pusher);
+
+        channel = pusher.subscribe(channelName);
+        channel.bind('new-message', (data) => {
+          // data: { matchId, message: { _id, sender, content, time } }
+          if (data.matchId === chatId) {
+            const msg = data.message;
+            setMessages((prev) => {
+              // Check if message already exists to prevent duplicates
+              const messageExists = prev.some(
+                (existingMsg) => existingMsg.id === msg._id
+              );
+              if (messageExists) {
+                return prev;
+              }
+
+              return [
+                ...prev,
+                {
+                  id: msg._id,
+                  sender: msg.sender === currentUserId ? 'user' : 'match', // Use closure variable
+                  content: msg.content,
+                  time: new Date(msg.time).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  }),
+                },
+              ];
+            });
+          }
+        });
       } catch (err) {
-        console.error('Failed to fetch chat:', err);
+        console.error('Error in fetchChat or Pusher setup:', err);
       }
     };
 
-    if (chatId) {
-      fetchChat();
-    }
+    fetchChat();
+
+    return () => {
+      // Cleanup: unsubscribe Pusher
+      if (channel) {
+        channel.unbind_all();
+        pusher.unsubscribe(channelName);
+      }
+      if (pusher) {
+        pusher.disconnect();
+      }
+    };
   }, [chatId]);
 
-  // Click outside emoji picker closes it
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        emojiPickerRef.current &&
-        !emojiPickerRef.current.contains(e.target)
-      ) {
-        setShowEmojiPicker(false);
-      }
-    };
-    if (showEmojiPicker) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showEmojiPicker]);
-
+  // Send a new message via your existing API
   const handleSendMessage = async () => {
     const content = newMessage.trim();
     if (!content) return;
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token to send message');
+      return;
+    }
 
-    // Optimistically append? Or wait for response? Here we'll wait for response to ensure saved.
+    // Create optimistic message
+    const optimisticMessage = {
+      id: `temp-${Date.now()}`, // Temporary ID
+      sender: 'user',
+      content: content,
+      time: new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      isOptimistic: true, // Flag to identify optimistic messages
+    };
+
+    // Add optimistic message immediately
+    setMessages((prev) => [...prev, optimisticMessage]);
+    setNewMessage('');
+    setShowEmojiPicker(false);
+
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('No token for sending message');
-        return;
-      }
-      // POST to backend
       const res = await axios.post(
         `/api/match/${chatId}/messages`,
         { content },
@@ -163,28 +209,25 @@ export default function ChatWindow({ chatId, onBack }) {
           },
         }
       );
+
       if (res.status === 201) {
-        const returned = res.data.message;
-        // Append returned message
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: returned._id,
-            sender: returned.sender === userId ? 'user' : 'match',
-            content: returned.content,
-            time: new Date(returned.time).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            }),
-          },
-        ]);
-        setNewMessage('');
-        setShowEmojiPicker(false);
+        // Remove the optimistic message since the real one will come via Pusher
+        setMessages((prev) =>
+          prev.filter((msg) => msg.id !== optimisticMessage.id)
+        );
       } else {
-        console.error('Failed to send message:', res.status, res.data);
+        console.error('Send message error:', res.status, res.data);
+        // Remove optimistic message on error
+        setMessages((prev) =>
+          prev.filter((msg) => msg.id !== optimisticMessage.id)
+        );
       }
     } catch (err) {
       console.error('Error sending message:', err);
+      // Remove optimistic message on error
+      setMessages((prev) =>
+        prev.filter((msg) => msg.id !== optimisticMessage.id)
+      );
     }
   };
 
@@ -265,11 +308,11 @@ export default function ChatWindow({ chatId, onBack }) {
             } space-y-1`}
           >
             <div
-              className={
+              className={`${
                 message.sender === 'user'
                   ? 'chat-bubble-user'
                   : 'chat-bubble-match'
-              }
+              } ${message.isOptimistic ? 'opacity-70' : ''}`}
             >
               {message.content}
             </div>
@@ -277,29 +320,10 @@ export default function ChatWindow({ chatId, onBack }) {
           </div>
         ))}
 
-        {isTyping && (
-          <div className='flex items-start space-y-1'>
-            <div className='chat-bubble-match flex items-center space-x-1'>
-              <div
-                className='w-2 h-2 bg-gray-600 rounded-full animate-bounce'
-                style={{ animationDelay: '0ms' }}
-              ></div>
-              <div
-                className='w-2 h-2 bg-gray-600 rounded-full animate-bounce'
-                style={{ animationDelay: '150ms' }}
-              ></div>
-              <div
-                className='w-2 h-2 bg-gray-600 rounded-full animate-bounce'
-                style={{ animationDelay: '300ms' }}
-              ></div>
-            </div>
-          </div>
-        )}
-
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input + Emoji Picker */}
+      {/* Input row */}
       <div className='p-4 bg-secondaryBackground border-t-2 border-black relative'>
         <div className='flex items-center gap-2'>
           <Button
