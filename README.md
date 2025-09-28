@@ -2,7 +2,7 @@
 
 > Where love meets gossip. The fun way to date in college.
 
----
+--- 
 
 ## 🌟 About The Project
 
